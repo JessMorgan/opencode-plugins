@@ -50,6 +50,14 @@ and sends the **originating session ID** to the chat-completions endpoint. It do
 not store an API key or change the session's model. Other providers use the native
 `ctx.generate.text()` API.
 
+Starting with `0.1.2`, credential lookup checks the model's own provider integration
+first, then the integration ID reported by the provider, accepting only API-key
+credentials. OpenCode Go can report the Console integration, whose active connection
+may be OAuth rather than the Go API key. Earlier releases used only that reported
+integration, causing compaction to fall back even when a Go key was connected.
+The fix does not embed connection IDs, keys, or endpoint URLs; it uses the selected
+model and runtime provider metadata.
+
 The Go adapter currently supports models using
 `@opencode/ai/providers/openai-compatible` (including the default DeepSeek model).
 Other Go protocols produce a diagnostic and fall back to normal compaction.
@@ -96,8 +104,9 @@ From the repository root:
 bun test ./packages/compaction-model/index.test.js
 ```
 
-The regression suite covers Go session routing, concurrent sessions, variant selection,
-long-history preservation, invalid/truncated results, and logged fallback. A live scratch
+The regression suite covers Go session routing, provider/integration mismatches and
+credential fallback, concurrent sessions, variant selection, long-history preservation,
+invalid/truncated results, and logged fallback. A live scratch
 session using Muse was manually compacted with DeepSeek and its checkpoint metadata verified.
 
 References: [V2 plugin hooks](https://opencode.ai/v2/docs/build/plugins/),

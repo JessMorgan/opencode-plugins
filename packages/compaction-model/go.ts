@@ -31,13 +31,24 @@ export async function generateGoSummary(
   if (typeof settings.baseURL !== "string")
     throw new CompactionError("Go endpoint is unavailable.");
 
+  // Go can report the Console integration, whose active connection is unrelated.
+  // Prefer the model's own integration and use the reported one only as a fallback.
   const provider = await ctx.provider.get({ providerID: model.providerID });
-  const connection = await ctx.integration.connection.active(
-    provider.data.integrationID ?? model.providerID
+  const candidates = [model.providerID, provider.data.integrationID].filter(
+    (id, index, all): id is string => typeof id === "string" && all.indexOf(id) === index
   );
-  const credential = connection ? await ctx.integration.connection.resolve(connection) : undefined;
-  if (credential?.type !== "key")
-    throw new CompactionError("Connect an OpenCode Go API key first.");
+  let credential: { key: string } | undefined;
+  for (const integrationID of candidates) {
+    const connection = await ctx.integration.connection.active(integrationID);
+    const resolved = connection
+      ? await ctx.integration.connection.resolve(connection)
+      : undefined;
+    if (resolved?.type === "key") {
+      credential = resolved;
+      break;
+    }
+  }
+  if (!credential) throw new CompactionError("Connect an OpenCode Go API key first.");
 
   const headers = new Headers({ ...selected.headers, ...variant?.headers });
   headers.set("authorization", `Bearer ${credential.key}`);

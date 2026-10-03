@@ -31,6 +31,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install npm with Trusted Publishing support
+        run: npm install --global npm@11
+
       - name: Install direnv for integration tests
         run: |
           sudo apt-get update

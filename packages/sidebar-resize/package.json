@@ -1,0 +1,56 @@
+{
+  "name": "@madsoftwaredev/opencode-sidebar-resize",
+  "version": "0.1.0",
+  "description": "OpenCode V2 TUI plugin for resizing the existing session sidebar by dragging or command.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "sidebar",
+    "resize",
+    "tui"
+  ],
+  "license": "MIT",
+  "author": "MadSoftwareDev",
+  "type": "module",
+  "exports": {
+    "./tui": "./tui.tsx"
+  },
+  "files": [
+    "tui.tsx",
+    "sidebar.ts",
+    "width.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git",
+    "directory": "packages/sidebar-resize"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins/tree/main/packages/sidebar-resize#readme",
+  "bugs": {
+    "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "bun test --preload @opentui/solid/preload",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.27"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.5.17",
+    "@opentui/solid": ">=0.5.17",
+    "solid-js": ">=1.9.12"
+  },
+  "devDependencies": {
+    "@types/bun": "1.3.9",
+    "typescript": "5.8.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -18,18 +18,18 @@
     "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
   },
   "scripts": {
-    "test": "bun test ./packages",
+    "test": "bun test --preload @opentui/solid/preload ./packages ./scripts",
     "test:release": "bun test ./scripts",
     "build:check": "bash ./scripts/build-check.sh",
-    "check": "bun run build:check && bun test ./packages ./scripts",
+    "check": "bun run build:check && bun run test",
     "release:plan": "bun scripts/publish.ts"
   },
   "devDependencies": {
-    "@opencode/plugin": "^2.0.12",
-    "@opencode/theme": "2.0.12",
-    "@opentui/core": "^0.5.10",
-    "@opentui/solid": "^0.5.10",
-    "solid-js": "^1.9.0",
+    "@opencode/plugin": "^2.0.27",
+    "@opencode/theme": "2.0.28",
+    "@opentui/core": "^0.5.17",
+    "@opentui/solid": "^0.5.17",
+    "solid-js": "1.9.12",
     "typescript": "^5.8.0"
   }
 }

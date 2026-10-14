@@ -4,9 +4,9 @@
 
 # OpenCode Plugins
 
-**Seven focused plugins for OpenCode V2.**
+**Eleven focused plugins for OpenCode V2.**
 
-Background subagents, live subagent visibility, session stats, lint feedback, direnv, and compaction, each in its own package.
+Persistent goals, chat usage, terminal customization, background subagents, lint feedback, direnv, and compaction, each in its own package.
 
 [![CI](https://github.com/madsoftwaredev/opencode-plugins/actions/workflows/ci.yml/badge.svg)](https://github.com/madsoftwaredev/opencode-plugins/actions/workflows/ci.yml)
 [![npm: background-subagent](https://img.shields.io/npm/v/@madsoftwaredev/opencode-background-subagent)](https://www.npmjs.com/package/@madsoftwaredev/opencode-background-subagent)
@@ -26,8 +26,8 @@ OpenCode V2 loads plugins from two places. Server plugins extend sessions, tools
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#f6f8fa', 'primaryBorderColor': '#57606a', 'primaryTextColor': '#24292f', 'lineColor': '#57606a'}}}%%
 flowchart LR
-    S["Server plugins (opencode.json)"] --> A["background-subagent · lint-feedback · direnv · compaction-model"]
-    T["TUI plugins (cli.json)"] --> B["subagent-sidebar · stats · btw"]
+    S["Server plugins (opencode.json)"] --> A["goal · background-subagent · lint-feedback · direnv · compaction-model"]
+    T["TUI plugins (cli.json)"] --> B["goal · chat-title · sidebar-resize · usage · subagent-sidebar · stats · btw"]
 ```
 
 ## Plugins
@@ -41,6 +41,10 @@ flowchart LR
 | [direnv](packages/direnv/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-direnv) | Server | Applies the approved direnv environment to each shell command's working directory. |
 | [Compaction model](packages/compaction-model/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-compaction-model) | Server | Summarizes checkpoints with a selectable model and reasoning variant. |
 | [`/btw`](packages/btw/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-btw) | TUI | Runs a side conversation in a background fork of the current session. |
+| [Goal](packages/goal/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-goal) | Server + TUI | Keeps a persistent goal across compaction, resumes work within a nudge budget, and shows goal state above the composer. |
+| [Chat title](packages/chat-title/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-chat-title) | TUI | Keeps the current chat title visible above the transcript while the sidebar is hidden. |
+| [Sidebar resize](packages/sidebar-resize/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-sidebar-resize) | TUI | Adds a draggable sidebar edge and saves the chosen width. |
+| [Usage](packages/usage/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-usage) | TUI | Shows chat and subagent tokens, cache efficiency, recorded cost, and API-equivalent cost in the sidebar and `/usage` popup. |
 
 Each plugin README documents its behavior, setup, and limitations.
 
@@ -97,9 +101,19 @@ opencode plugin add @madsoftwaredev/opencode-compaction-model
 opencode plugin add @madsoftwaredev/opencode-subagent-sidebar
 opencode plugin add @madsoftwaredev/opencode-stats
 opencode plugin add @madsoftwaredev/opencode-btw
+opencode plugin add @madsoftwaredev/opencode-chat-title
+opencode plugin add @madsoftwaredev/opencode-sidebar-resize
+opencode plugin add @madsoftwaredev/opencode-usage
+
+# Server + TUI
+opencode plugin add @madsoftwaredev/opencode-goal
 ```
 
 Restart the OpenCode TUI after installing a TUI plugin.
+
+Stats and usage are separate: stats adds speed, turns, and steps to the footer;
+usage adds token and cost accounting to the sidebar and `/usage` popup. Install
+either or both. Goal needs its server plugin running for its TUI to show state.
 
 Each package has its own version line, so `opencode plugin update` moves only the
 packages that changed.
@@ -149,7 +163,8 @@ for details and a working configuration example.
 | --- | --- |
 | direnv | `direnv` installed where the OpenCode server runs, plus an approved `.envrc` per project (`direnv allow`). |
 | Lint feedback | Node on the shell's `PATH`, project-installed ESLint 9 or 10, and a flat `eslint.config.*` file. |
-| Subagent sidebar, stats, `/btw` | The OpenCode terminal UI. |
+| Subagent sidebar, stats, `/btw`, chat title, sidebar resize, usage | The OpenCode terminal UI. |
+| Goal, chat title, sidebar resize, usage | OpenCode V2 with the 2.0.27 plugin API and OpenTUI 0.5.17 or later. Goal also requires its server plugin. |
 
 ## Develop
 
@@ -162,7 +177,8 @@ bun install --frozen-lockfile
 bun run check
 ```
 
-`bun run check` runs the entrypoint build check and all package tests. Tests use
+`bun run check` runs the entrypoint build check and all package and release-script tests.
+The test command preloads the OpenTUI Solid JSX transform for rendered TUI tests. Tests use
 temporary projects and do not require a live OpenCode server.
 
 To try a package directly from the latest source before a release:
@@ -185,6 +201,17 @@ then update only the manifests you changed and refresh the lockfile:
 bun install
 bun run check
 ```
+
+For a package's **first** npm release, sign in with `npm login` and publish that
+package once locally, for example:
+
+```sh
+bun scripts/publish.ts packages/goal --expected-version 0.1.0
+```
+
+Then configure that new package's Trusted Publisher to use `release.yml`, as
+described below. Existing packages' Trusted Publisher settings do not change.
+Subsequent releases use the tag-triggered workflow.
 
 Preview what a tag would publish before pushing it (the planned version must
 already be in the manifest):

@@ -1,0 +1,55 @@
+{
+  "name": "@madsoftwaredev/opencode-goal",
+  "version": "0.1.0",
+  "description": "OpenCode V2 server and TUI plugin for durable session goals, bounded continuation loops, and live goal status over RPC.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "goal",
+    "session",
+    "rpc",
+    "tui"
+  ],
+  "license": "MIT",
+  "author": "MadSoftwareDev",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./rpc": "./goal-rpc.ts",
+    "./tui": "./tui.tsx"
+  },
+  "files": [
+    "index.ts",
+    "goal-state.ts",
+    "goal-rpc.ts",
+    "tui.tsx",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madsoftwaredev/opencode-plugins.git",
+    "directory": "packages/goal"
+  },
+  "homepage": "https://github.com/madsoftwaredev/opencode-plugins/tree/main/packages/goal#readme",
+  "bugs": {
+    "url": "https://github.com/madsoftwaredev/opencode-plugins/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "bun test --preload @opentui/solid/preload"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.27"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.5.17",
+    "@opentui/solid": ">=0.5.17",
+    "solid-js": ">=1.9.12"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

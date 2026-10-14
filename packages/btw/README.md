@@ -1,9 +1,14 @@
 # @madsoftwaredev/opencode-btw
 
+> [!WARNING]
+> Deprecated: `/btw` is no longer maintained. Remove
+> `@madsoftwaredev/opencode-btw` from your OpenCode plugins configuration.
+> The source and documentation below remain available for reference.
+
 OpenCode V2 TUI plugin that adds `/btw` to run a prompt in a background fork of
 the current session.
 
-## Install
+## Previous installation (deprecated)
 
 ```sh
 opencode plugin add @madsoftwaredev/opencode-btw

@@ -74,7 +74,7 @@ jobs:
       - name: Verify before publish
         run: |
           bun run build:check
-          bun test ./packages ./scripts
+          bun run test
 
       - name: Publish ${{ steps.tag.outputs.dir }}
         run: |

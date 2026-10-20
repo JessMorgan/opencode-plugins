@@ -4,7 +4,7 @@
 
 # OpenCode Plugins
 
-**Ten maintained plugins for OpenCode V2.**
+**Ten published plugins and one pending plugin for OpenCode V2.**
 
 Persistent goals, chat usage, terminal customization, background subagents, lint feedback, direnv, and compaction, each in its own package.
 
@@ -27,19 +27,20 @@ OpenCode V2 loads plugins from two places. Server plugins extend sessions, tools
 %%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#f6f8fa', 'primaryBorderColor': '#57606a', 'primaryTextColor': '#24292f', 'lineColor': '#57606a'}}}%%
 flowchart LR
     S["Server plugins (opencode.json)"] --> A["goal · background-subagent · lint-feedback · direnv · compaction-model"]
-    T["TUI plugins (cli.json)"] --> B["goal · chat-title · sidebar-resize · usage · subagent-sidebar · stats"]
+    T["TUI plugins (cli.json)"] --> B["goal · background-subagent · chat-title · sidebar-resize · compaction-fold · usage · subagent-sidebar · stats"]
 ```
 
 ## Plugins
 
 | Plugin | Surface | What It Does |
 | --- | --- | --- |
-| [Background subagent](packages/background-subagent/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-background-subagent) | Server | Runs subagents in the background by default; explicit foreground calls still wait. |
+| [Background subagent](packages/background-subagent/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-background-subagent) | Server + TUI | Runs subagents in the background by default and highlights delegated work above the prompt, outside folded tool messages. |
 | [Subagent sidebar](packages/subagent-sidebar/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-subagent-sidebar) | TUI | Shows live child and nested subagent sessions; click a row to open it. |
 | [Stats](packages/stats/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-stats) | TUI | Shows token speed and session-wide turn and step counts in the prompt footer; toggle each in the TUI. |
 | [Lint feedback](packages/lint-feedback/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-lint-feedback) | Server | Appends project-local ESLint diagnostics after successful edits. Checks only, never fixes. |
 | [direnv](packages/direnv/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-direnv) | Server | Applies the approved direnv environment to each shell command's working directory. |
 | [Compaction model](packages/compaction-model/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-compaction-model) | Server | Summarizes checkpoints with a selectable model and reasoning variant. |
+| [Compaction fold](packages/compaction-fold/README.md) · pending release | TUI | Folds only generated compaction summaries into clickable rows; configurable default open or closed. Current-host compatibility update required before publication. |
 | [Goal](packages/goal/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-goal) | Server + TUI | Keeps a persistent goal across compaction, resumes work within a nudge budget, and shows goal state above the composer. |
 | [Chat title](packages/chat-title/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-chat-title) | TUI | Keeps the current chat title visible above the transcript while the sidebar is hidden. |
 | [Sidebar resize](packages/sidebar-resize/README.md) · [npm](https://www.npmjs.com/package/@madsoftwaredev/opencode-sidebar-resize) | TUI | Adds a draggable sidebar edge and saves the chosen width. |
@@ -97,7 +98,6 @@ Requires OpenCode V2. Install each package you want with `opencode plugin add`:
 
 ```sh
 # Server plugins (opencode.json)
-opencode plugin add @madsoftwaredev/opencode-background-subagent
 opencode plugin add @madsoftwaredev/opencode-lint-feedback
 opencode plugin add @madsoftwaredev/opencode-direnv
 opencode plugin add @madsoftwaredev/opencode-compaction-model
@@ -110,6 +110,7 @@ opencode plugin add @madsoftwaredev/opencode-sidebar-resize
 opencode plugin add @madsoftwaredev/opencode-usage
 
 # Server + TUI
+opencode plugin add @madsoftwaredev/opencode-background-subagent
 opencode plugin add @madsoftwaredev/opencode-goal
 ```
 
@@ -167,8 +168,10 @@ for details and a working configuration example.
 | --- | --- |
 | direnv | `direnv` installed where the OpenCode server runs, plus an approved `.envrc` per project (`direnv allow`). |
 | Lint feedback | Node on the shell's `PATH`, project-installed ESLint 9 or 10, and a flat `eslint.config.*` file. |
-| Subagent sidebar, stats, chat title, sidebar resize, usage | The OpenCode terminal UI. |
-| Goal, chat title, sidebar resize, usage | OpenCode V2 with the 2.0.27 plugin API and OpenTUI 0.5.17 or later. Goal also requires its server plugin. |
+| Subagent sidebar, stats, chat title, sidebar resize, compaction fold, usage | The OpenCode terminal UI. |
+| Background subagent activity strip, goal, chat title, usage | OpenCode V2 with the 2.0.27 plugin API and OpenTUI 0.5.17 or later. Goal also requires its server plugin. |
+| Sidebar resize | OpenCode 2.1.0 and OpenTUI 0.6.6 or later; uses an internal sidebar-layout adapter. |
+| Compaction fold (pending) | Development target: plugin API 2.0.27 / OpenTUI 0.5.17. Not compatible with OpenTUI 0.6.6; publication awaits an adapter update. See its [compatibility notes](packages/compaction-fold/README.md#compatibility-and-safety). |
 
 ## Develop
 
@@ -182,7 +185,8 @@ bun run check
 ```
 
 `bun run check` runs the entrypoint build check and all package and release-script tests.
-The test command preloads the OpenTUI Solid JSX transform for rendered TUI tests. Tests use
+The test command runs each package in a separate process so its OpenTUI version owns
+its native runtime, and preloads the Solid JSX transform for rendered TUI tests. Tests use
 temporary projects and do not require a live OpenCode server.
 
 To try a package directly from the latest source before a release:

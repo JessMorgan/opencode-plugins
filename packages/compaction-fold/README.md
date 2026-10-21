@@ -12,11 +12,8 @@ history, and model context are never changed. No server plugin is needed.
 
 ## Install
 
-This pending package targets OpenCode V2's 2.0.27 plugin API and OpenTUI 0.5.17.
-It is not release-ready for OpenCode 2.1.0 / OpenTUI 0.6.6: that runtime removed
-the `getLayoutNode()` API used by this adapter. npm publication is pending a
-compatibility update and verification against the current host.
-After this package is published:
+Requires OpenCode 2.1.0 and OpenTUI 0.6.6 or later. Version 0.1.1 uses the
+supported renderable style getters instead of the removed `getLayoutNode()` API.
 
 ```sh
 opencode plugin add @madsoftwaredev/opencode-compaction-fold
@@ -69,8 +66,9 @@ removes its callback and rows on cleanup.
 
 This is an internal-layout compatibility adapter, **not a stable OpenCode API**.
 Future host changes or other transcript-mutating plugins can prevent folding;
-unsupported session layouts show one warning and remain untouched. Headless
-tests cover the inspected shape, not a live installed OpenCode release. Expanding
+unsupported session layouts, including errors during initial layout discovery,
+show one warning and remain untouched. Headless tests run against OpenTUI 0.6.6
+and cover the inspected shape, not a live installed OpenCode release. Expanding
 a long summary changes transcript height and can move the scroll position.
 
 ## Development

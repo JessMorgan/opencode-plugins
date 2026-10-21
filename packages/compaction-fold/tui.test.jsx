@@ -1,7 +1,7 @@
 /** @jsxImportSource @opentui/solid */
 
 import { afterEach, expect, spyOn, test } from "bun:test";
-import { RGBA, SyntaxStyle } from "@opentui/core";
+import { Renderable, RGBA, SyntaxStyle } from "@opentui/core";
 import { createTestRenderer } from "@opentui/core/testing";
 import { render } from "@opentui/solid";
 import { createSignal, For, Show } from "solid-js";
@@ -9,8 +9,8 @@ import { createStore } from "solid-js/store";
 import plugin from "./tui";
 
 const cleanups = [];
-afterEach(() => {
-  for (const cleanup of cleanups.splice(0).reverse()) cleanup();
+afterEach(async () => {
+  for (const cleanup of cleanups.splice(0).reverse()) await cleanup();
 });
 
 const compact = (id = "compact", summary = "Generated checkpoint summary", status = "completed") =>
@@ -18,9 +18,9 @@ const compact = (id = "compact", summary = "Generated checkpoint summary", statu
 
 async function mount({ options = {}, initial = [compact()], width = 80, supported = true } = {}) {
   const setup = await createTestRenderer({ width, height: 40 });
-  cleanups.push(() => setup.renderer.destroy());
-  const syntax = SyntaxStyle.fromStyles({});
-  cleanups.push(() => syntax.destroy());
+  cleanups.push(() => setup.dispose());
+  const syntax = SyntaxStyle.fromStyles({}, setup.renderer.nativeScene);
+  cleanups.push(async () => { await setup.renderer.idle(); syntax.destroy(); });
   const [messages, setMessages] = createStore({ a: initial, b: [compact("other", "Other session summary")] });
   const [session, setSession] = createSignal("a");
   const [enabled, setEnabled] = createSignal(true);
@@ -236,6 +236,21 @@ test("unsupported session layouts warn once and do not fold anything", async () 
   await view.renderOnce();
   expect(view.record().body.visible).toBe(true);
   expect(view.control()).toBeUndefined();
+  expect(view.toasts).toHaveLength(1);
+});
+
+test("layout discovery errors warn once without crashing the composer slot", async () => {
+  const warning = spyOn(console, "warn").mockImplementation(() => {});
+  const padding = spyOn(Renderable.prototype, "getPadding").mockImplementationOnce(() => {
+    throw new Error("Changed host layout API");
+  });
+  cleanups.push(() => { warning.mockRestore(); padding.mockRestore(); });
+  const view = await mount();
+  await view.renderOnce();
+  expect(view.record().body.visible).toBe(true);
+  expect(view.control()).toBeUndefined();
+  expect(view.captureCharFrame()).toContain("Composer");
+  expect(warning).toHaveBeenCalledTimes(1);
   expect(view.toasts).toHaveLength(1);
 });
 

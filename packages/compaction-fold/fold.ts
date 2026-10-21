@@ -24,13 +24,12 @@ function findTranscript(anchor: Renderable, core: Core) {
     if (composer !== branch || !(transcript instanceof core.BoxRenderable) || !jump) continue;
     const scroll = transcript.getChildren()[0];
     if (!(scroll instanceof core.ScrollBoxRenderable)) continue;
-    const layout = node.getLayoutNode();
-    const height = jump.getLayoutNode().getHeight();
-    const padding = layout.getPadding(Edge.Bottom);
+    const height = jump.getHeight();
+    const padding = node.getPadding(Edge.Bottom);
     if (
-      height.unit === Unit.Point && height.value === 1 && jump.getLayoutNode().getFlexShrink() === 0 &&
-      padding.unit === Unit.Point && padding.value === 1 && layout.getFlexGrow() === 1 &&
-      node.parent?.getLayoutNode().getFlexDirection() === FlexDirection.Row
+      height.unit === Unit.Point && height.value === 1 && jump.getFlexShrink() === 0 &&
+      padding.unit === Unit.Point && padding.value === 1 && node.getFlexGrow() === 1 &&
+      node.parent?.getFlexDirection() === FlexDirection.Row
     ) return scroll;
   }
 }
@@ -49,14 +48,14 @@ function summaryBody(
   const [heading, body] = parts;
   if (!(heading instanceof core.BoxRenderable) || !(body instanceof core.BoxRenderable)) return;
   const { Edge, Unit, FlexDirection } = core.Yoga;
-  if (heading.getLayoutNode().getFlexDirection() !== FlexDirection.Row) return;
+  if (heading.getFlexDirection() !== FlexDirection.Row) return;
   const header = heading.getChildren();
   if (header.length !== 3 || !header.every((node) => node instanceof core.BoxRenderable)) return;
   for (const line of [header[0], header[2]] as BoxRenderable[]) {
     if (!Array.isArray(line.border) || line.border.length !== 1 || line.border[0] !== "top") return;
-    if (line.getLayoutNode().getFlexGrow() !== 1) return;
+    if (line.getFlexGrow() !== 1) return;
   }
-  if (header[1].getLayoutNode().getFlexDirection() !== FlexDirection.Row) return;
+  if (header[1].getFlexDirection() !== FlexDirection.Row) return;
   if (!header[1].getChildren().some((node) => {
     if (!(node instanceof core.TextRenderable)) return false;
     // JSX text is committed to plainText during layout, after frame callbacks.
@@ -66,9 +65,8 @@ function summaryBody(
     const text = node.textNode.isDirty && children.length ? children.join("") : node.plainText;
     return text === "Compaction" || text === "Provider compaction";
   })) return;
-  const layout = body.getLayoutNode();
-  const top = layout.getPadding(Edge.Top);
-  const left = layout.getPadding(Edge.Left);
+  const top = body.getPadding(Edge.Top);
+  const left = body.getPadding(Edge.Left);
   if (top.unit !== Unit.Point || top.value !== 1 || left.unit !== Unit.Point || left.value !== 3) return;
   const content = body.getChildren();
   if (content.length !== 1 || !(content[0] instanceof core.MarkdownRenderable)) return;
@@ -85,7 +83,14 @@ export function attachCompactionFold(options: {
   color: () => RGBA;
   unsupported: () => void;
 }): { refresh: () => void; dispose: () => void } | undefined {
-  const scroll = findTranscript(options.anchor, options.core);
+  let scroll;
+  try {
+    scroll = findTranscript(options.anchor, options.core);
+  } catch (error) {
+    // Discovery happens before the guarded frame callback, during slot mounting.
+    console.warn("[compaction-fold] Unsupported render tree; summaries left visible", error);
+    return;
+  }
   if (!scroll) return;
   const folds = new Map<Renderable, Fold>();
   // Kept across host row remounts, but only for this mounted session view.

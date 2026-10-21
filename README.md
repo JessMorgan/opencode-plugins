@@ -170,8 +170,8 @@ for details and a working configuration example.
 | direnv | `direnv` installed where the OpenCode server runs, plus an approved `.envrc` per project (`direnv allow`). |
 | Lint feedback | Node on the shell's `PATH`, project-installed ESLint 9 or 10, and a flat `eslint.config.*` file. |
 | Subagent sidebar, stats, chat title, sidebar resize, compaction fold, usage | The OpenCode terminal UI. |
-| Background subagent activity strip, goal, chat title, usage | OpenCode V2 with the 2.0.27 plugin API and OpenTUI 0.5.17 or later. Goal also requires its server plugin. |
-| Sidebar resize | OpenCode 2.1.0 and OpenTUI 0.6.6 or later; uses an internal sidebar-layout adapter. |
+| Background subagent activity strip, goal, usage | OpenCode V2 with the 2.0.27 plugin API and OpenTUI 0.5.17 or later. Goal also requires its server plugin. |
+| Sidebar resize, chat title | OpenCode 2.1.0 and OpenTUI 0.6.6 or later; use internal layout adapters. |
 | Compaction fold | OpenCode 2.1.0 and OpenTUI 0.6.6 or later; uses an internal transcript-layout adapter. See its [compatibility notes](packages/compaction-fold/README.md#compatibility-and-safety). |
 
 ## Develop

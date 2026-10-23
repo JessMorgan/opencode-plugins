@@ -1,6 +1,6 @@
 # @madsoftwaredev/opencode-stats
 
-An OpenCode V2 TUI plugin by MAD Software. It adds three inline statistics to
+An OpenCode V2 TUI plugin. It adds three inline statistics to
 the session prompt footer:
 
 ```text

@@ -8,7 +8,6 @@
 
 Persistent goals, chat usage, terminal customization, background subagents, lint feedback, direnv, and compaction, each in its own package.
 
-[![CI](https://github.com/madsoftwaredev/opencode-plugins/actions/workflows/ci.yml/badge.svg)](https://github.com/madsoftwaredev/opencode-plugins/actions/workflows/ci.yml)
 [![npm: background-subagent](https://img.shields.io/npm/v/@madsoftwaredev/opencode-background-subagent)](https://www.npmjs.com/package/@madsoftwaredev/opencode-background-subagent)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -17,7 +16,7 @@ Persistent goals, chat usage, terminal customization, background subagents, lint
 </div>
 
 > [!NOTE]
-> Built and maintained by [MAD Software](https://github.com/madsoftwaredev).
+> These plugins are maintained here — pull requests are welcome.
 
 ## How It Works
 
@@ -175,7 +174,7 @@ for details and a working configuration example.
 Development and tests require Bun, Node.js 22+, and `direnv`:
 
 ```sh
-git clone https://github.com/madsoftwaredev/opencode-plugins.git
+git clone https://github.com/JessMorgan/opencode-plugins.git
 cd opencode-plugins
 bun install --frozen-lockfile
 bun run check
@@ -188,12 +187,12 @@ temporary projects and do not require a live OpenCode server.
 To try a package directly from the latest source before a release:
 
 ```sh
-opencode plugin add 'github:madsoftwaredev/opencode-plugins#main::path:packages/direnv'
+opencode plugin add 'github:JessMorgan/opencode-plugins#main::path:packages/direnv'
 ```
 
 Replace `direnv` with the package directory you want to try.
 
-Issues and ideas are welcome in the [GitHub issue tracker](https://github.com/madsoftwaredev/opencode-plugins/issues).
+Contributions are welcome via [pull requests](https://github.com/JessMorgan/opencode-plugins/pulls).
 
 <details>
 <summary><b>Maintainers: Publishing Releases</b></summary>
